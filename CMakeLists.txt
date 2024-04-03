@@ -32,6 +32,6 @@ add_subdirectory (plugin)
 add_subdirectory (thirdparty/Box2D)
 
 # TODO Enable examples for Android
-if (NOT ANDROID)
+if (NOT (ANDROID OR IOS))
     add_subdirectory (examples)
 endif()
