@@ -26,6 +26,8 @@ project (Box2D)
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Let AUTOMOC and AUTOUIC process generated sources
+cmake_policy(SET CMP0071 NEW)
 find_package(Qt6 COMPONENTS Quick Core Qml)
 
 set(PLUGIN_SOURCES
@@ -68,7 +70,7 @@ set(PLUGIN_SOURCES
     )
 
 set(BOX2D_PLUGIN_LINKING SHARED)
-if (ANDROID)
+if (ANDROID OR IOS)
     set(BOX2D_PLUGIN_LINKING STATIC)
 endif()
 
