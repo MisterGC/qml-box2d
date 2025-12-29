@@ -1,7 +1,7 @@
-import QtQuick 2.2
-import QtQuick.Controls 1.1
-import Box2D 2.0
-import QtMultimedia 5.0
+import QtQuick
+import QtQuick.Controls
+import Box2D
+import QtMultimedia
 import "../shared"
 
 Rectangle {
@@ -352,8 +352,8 @@ Rectangle {
 
     Slider {
         id: power
-        minimumValue: 0.01
-        maximumValue: 5
+        from: 0.01
+        to: 5
         value: 3
         width: 200
         height: 30

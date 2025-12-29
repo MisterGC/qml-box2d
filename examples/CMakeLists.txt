@@ -1,6 +1,6 @@
 #
 # examples/CMakeLists.txt
-# Copyright (c) 2019 Serein Pfeiffer <serein.pfeiffer@gmail.com>
+# Copyright (c) 2021 Serein Pfeiffer <serein.pfeiffer@gmail.com>
 #
 # This file is part of the Box2D QML plugin.
 #
@@ -23,15 +23,11 @@
 cmake_minimum_required (VERSION 3.5.0 FATAL_ERROR)
 project (box2qml-examples)
 
-find_package(Qt6 COMPONENTS Quick Core Qml)
-if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 COMPONENTS Quick Core Qml REQUIRED)
-endif()
+find_package(Qt6 COMPONENTS Quick Core Multimedia Qml REQUIRED)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_AUTORCC ON)
-
-add_executable (${PROJECT_NAME} 
+set(PROJECT_SOURCES
     main.cpp
     example.qrc
 
@@ -90,7 +86,7 @@ add_executable (${PROJECT_NAME}
 
     polygons/Trapezoid.qml
     polygons/polygons.qml
-    
+
     prismatic/Square.qml
     prismatic/prismatic.qml
 
@@ -127,6 +123,8 @@ add_executable (${PROJECT_NAME}
     wheel/main.qml
 )
 
+qt_add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
 set_target_properties (${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
@@ -137,5 +135,6 @@ target_link_libraries (${PROJECT_NAME}
 PRIVATE
     Qt::Core
     Qt::Quick
+    Qt::Multimedia
     Qt::Qml
 )

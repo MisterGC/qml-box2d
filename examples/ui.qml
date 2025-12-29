@@ -1,7 +1,7 @@
 import QtQuick 2.4;
 import QtQuick.Window 2.1;
 import QtQuick.Layouts 1.1
-import Box2D 2.0;
+import Box2D;
 //import "shared"
 
 Window {
@@ -98,10 +98,6 @@ Window {
             path: "revolute/revolute.qml"
         }
         ListElement {
-            name: "revolute plot angle"
-            path: "revoluteplotangle/revolutePlotAngle.qml"
-        }
-        ListElement {
             name: "rope"
             path: "rope/main.qml"
         }
@@ -133,7 +129,7 @@ Window {
 
             MouseArea {
             anchors.fill: listView
-            onWheel: listView.flick(0, wheel.angleDelta.y * 5)
+            onWheel: (wheel)=> {listView.flick(0, wheel.angleDelta.y * 5)}
             }
 
 

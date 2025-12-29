@@ -1,6 +1,6 @@
 #
 # plugin/CMakeLists.txt
-# Copyright (c) 2019 Serein Pfeiffer <serein.pfeiffer@gmail.com>
+# Copyright (c) 2021 Serein Pfeiffer <serein.pfeiffer@gmail.com>
 #
 # This file is part of the Box2D QML plugin.
 #
@@ -21,21 +21,16 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 cmake_minimum_required (VERSION 3.5.0 FATAL_ERROR)
-project (box2dqml)
+project (Box2D)
 
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Let AUTOMOC and AUTOUIC process generated sources
+cmake_policy(SET CMP0071 NEW)
 find_package(Qt6 COMPONENTS Quick Core Qml)
-if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 COMPONENTS Quick Core Qml REQUIRED)
-endif()
 
-if (NOT QML_PLUGIN_LINK_TYPE)
-  set(QML_PLUGIN_LINK_TYPE SHARED)
-endif()
-
-add_library (${PROJECT_NAME} ${QML_PLUGIN_LINK_TYPE}
+set(PLUGIN_SOURCES
     box2dbody.cpp
     box2dbody.h
     box2dcontact.cpp
@@ -56,8 +51,6 @@ add_library (${PROJECT_NAME} ${QML_PLUGIN_LINK_TYPE}
     box2dmotorjoint.h
     box2dmousejoint.cpp
     box2dmousejoint.h
-    box2dplugin.cpp
-    box2dplugin.h
     box2dprismaticjoint.cpp
     box2dprismaticjoint.h
     box2dpulleyjoint.cpp
@@ -74,25 +67,27 @@ add_library (${PROJECT_NAME} ${QML_PLUGIN_LINK_TYPE}
     box2dwheeljoint.h
     box2dworld.cpp
     box2dworld.h
-    qmldir
     )
 
-set (PLUGIN_DEST_DIR "${QMLBOX2D_PLUGIN_BASE_DIR}/Box2D")
+set(BOX2D_PLUGIN_LINKING SHARED)
+if (ANDROID OR IOS)
+    set(BOX2D_PLUGIN_LINKING STATIC)
+endif()
+
+qt_add_qml_module(${PROJECT_NAME}
+    URI ${PROJECT_NAME}
+    ${BOX2D_PLUGIN_LINKING}
+    OUTPUT_DIRECTORY ${QMLBOX2D_PLUGIN_BASE_DIR}/${PROJECT_NAME}
+    VERSION 2.0
+    SOURCES ${PLUGIN_SOURCES}
+)
+
 set_target_properties(
 ${PROJECT_NAME}
 PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS NO
-    LIBRARY_OUTPUT_DIRECTORY "${PLUGIN_DEST_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_DEST_DIR}"
-)
-
-target_include_directories (${PROJECT_NAME} PUBLIC ./)
-
-target_compile_definitions(${PROJECT_NAME}
-PRIVATE
-    $<$<STREQUAL:${QML_PLUGIN_LINK_TYPE},STATIC>:QT_STATICPLUGIN>
 )
 
 target_link_libraries (${PROJECT_NAME}
@@ -101,19 +96,5 @@ PRIVATE
     Qt::Quick
     Qt::Qml
 PUBLIC
-    box2d
+    box2dcpp
 )
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_CURRENT_SOURCE_DIR}/qmldir
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/qmldir
-)
-
-if (Qt6_FOUND)
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        QT_QML_MODULE_VERSION 2.0
-        QT_QML_MODULE_URI     Box2D
-    )
-    qt6_qml_type_registration(${PROJECT_NAME})
-endif()

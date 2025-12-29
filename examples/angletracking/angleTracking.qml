@@ -1,5 +1,5 @@
-import QtQuick 2.4
-import Box2D 2.0
+import QtQuick
+import Box2D
 import "../shared"
 
 Item {
@@ -25,7 +25,7 @@ Item {
     }
 
 
-    Keys.onPressed: {
+    Keys.onPressed: (event)=> {
 	    if (event.key === Qt.Key_Up) {
 	    	console.log("Key up")
 	    	revolute.enableMotor = true
