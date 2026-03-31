@@ -23,6 +23,8 @@ PhysicsItem {
 
     fixtures: Circle {
         radius: speciesInfo.radius
+        x: radius
+        y: radius
         density: 0.2
         friction: 0.3
         restitution: 0.2

@@ -110,9 +110,11 @@ void DebugDraw::DrawPolygon(const b2Vec2 *vertices,
                             int32 vertexCount,
                             const b2Color &color)
 {
+    // DrawLineLoop not supported in Qt 6 (Metal/Vulkan).
+    // Convert to DrawLineStrip with closing segment.
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
-                                            vertexCount);
-    geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
+                                            vertexCount + 1);
+    geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
     geometry->setLineWidth(LINE_WIDTH);
 
     QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
@@ -120,6 +122,9 @@ void DebugDraw::DrawPolygon(const b2Vec2 *vertices,
         QPointF point = mWorld.toPixels(vertices[i]);
         points[i].set(point.x(), point.y());
     }
+    // Close the loop
+    QPointF first = mWorld.toPixels(vertices[0]);
+    points[vertexCount].set(first.x(), first.y());
 
     createNode(geometry, toQColor(color));
 }
@@ -128,15 +133,23 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2 *vertices,
                                  int32 vertexCount,
                                  const b2Color &color)
 {
+    // DrawTriangleFan not supported in Qt 6 (Metal/Vulkan).
+    // Manually triangulate the convex polygon.
+    int triCount = vertexCount - 2;
+    if (triCount < 1) return;
+
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
-                                            vertexCount);
-    geometry->setDrawingMode(QSGGeometry::DrawTriangleFan);
-    geometry->setLineWidth(LINE_WIDTH);
+                                            triCount * 3);
+    geometry->setDrawingMode(QSGGeometry::DrawTriangles);
 
     QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-    for (int i = 0; i < vertexCount; ++i) {
-        QPointF point = mWorld.toPixels(vertices[i]);
-        points[i].set(point.x(), point.y());
+    QPointF p0 = mWorld.toPixels(vertices[0]);
+    for (int i = 0; i < triCount; ++i) {
+        QPointF p1 = mWorld.toPixels(vertices[i + 1]);
+        QPointF p2 = mWorld.toPixels(vertices[i + 2]);
+        points[i * 3 + 0].set(p0.x(), p0.y());
+        points[i * 3 + 1].set(p1.x(), p1.y());
+        points[i * 3 + 2].set(p2.x(), p2.y());
     }
 
     createNode(geometry, toQColor(color));
@@ -146,19 +159,21 @@ void DebugDraw::DrawCircle(const b2Vec2 &center,
                            float32 radius,
                            const b2Color &color)
 {
+    // DrawLineLoop not supported in Qt 6. Use DrawLineStrip + closing vertex.
+    int segments = CIRCLE_SEGMENTS_COUNT;
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
-                                            CIRCLE_SEGMENTS_COUNT);
-    geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
+                                            segments + 1);
+    geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
     geometry->setLineWidth(LINE_WIDTH);
 
-    QPointF centerInPixels = mWorld.toPixels(center);
-    qreal radiusInPixels = mWorld.toPixels(radius);
+    QPointF c = mWorld.toPixels(center);
+    qreal r = mWorld.toPixels(radius);
 
     QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-    for (int i = 0; i < CIRCLE_SEGMENTS_COUNT; ++i) {
-        float theta = i * 2 * M_PI / (CIRCLE_SEGMENTS_COUNT - 2);
-        points[i].set(centerInPixels.x() + radiusInPixels * qCos(theta),
-                      centerInPixels.y() + radiusInPixels * qSin(theta));
+    for (int i = 0; i <= segments; ++i) {
+        float theta = i * 2.0f * M_PI / segments;
+        points[i].set(c.x() + r * qCos(theta),
+                      c.y() + r * qSin(theta));
     }
 
     createNode(geometry, toQColor(color));
@@ -167,33 +182,36 @@ void DebugDraw::DrawCircle(const b2Vec2 &center,
 void DebugDraw::DrawSolidCircle(const b2Vec2 &center, float32 radius,
                                 const b2Vec2 &axis, const b2Color &color)
 {
-
+    // DrawTriangleFan not supported in Qt 6. Triangulate manually.
+    int segments = CIRCLE_SEGMENTS_COUNT;
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
-                                            CIRCLE_SEGMENTS_COUNT);
-    geometry->setDrawingMode(QSGGeometry::DrawTriangleFan);
-    geometry->setLineWidth(LINE_WIDTH);
+                                            segments * 3);
+    geometry->setDrawingMode(QSGGeometry::DrawTriangles);
 
-    QPointF centerInPixels = mWorld.toPixels(center);
-    QPointF axisInPixels = mWorld.toPixels(axis);
-    qreal radiusInPixels = mWorld.toPixels(radius);
-    axisInPixels.setX(centerInPixels.x() + radius * axisInPixels.x());
-    axisInPixels.setY(centerInPixels.y() + radius * axisInPixels.y());
+    QPointF c = mWorld.toPixels(center);
+    qreal r = mWorld.toPixels(radius);
 
     QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-    points[0].set(centerInPixels.x(), centerInPixels.y());
-    for (int i = 1; i < CIRCLE_SEGMENTS_COUNT; ++i) {
-        float theta = i * 2 * M_PI / (CIRCLE_SEGMENTS_COUNT - 2);
-        points[i].set(centerInPixels.x() + radiusInPixels * qCos(theta),
-                      centerInPixels.y() + radiusInPixels * qSin(theta));
+    for (int i = 0; i < segments; ++i) {
+        float theta0 = i * 2.0f * M_PI / segments;
+        float theta1 = (i + 1) * 2.0f * M_PI / segments;
+        points[i * 3 + 0].set(c.x(), c.y());
+        points[i * 3 + 1].set(c.x() + r * qCos(theta0), c.y() + r * qSin(theta0));
+        points[i * 3 + 2].set(c.x() + r * qCos(theta1), c.y() + r * qSin(theta1));
     }
-    QSGNode * node = createNode(geometry,toQColor(color));
+
+    QSGNode *node = createNode(geometry, toQColor(color));
+
+    // Axis indicator line
+    QPointF axisEnd = mWorld.toPixels(axis);
+    axisEnd = QPointF(c.x() + r * axisEnd.x() / mWorld.toPixels(1.0f),
+                      c.y() + r * axisEnd.y() / mWorld.toPixels(1.0f));
 
     QSGGeometry *axisGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 2);
     axisGeometry->setDrawingMode(QSGGeometry::DrawLines);
     axisGeometry->setLineWidth(LINE_WIDTH);
-
-    axisGeometry->vertexDataAsPoint2D()[0].set(centerInPixels.x(), centerInPixels.y());
-    axisGeometry->vertexDataAsPoint2D()[1].set(axisInPixels.x(), axisInPixels.y());
+    axisGeometry->vertexDataAsPoint2D()[0].set(c.x(), c.y());
+    axisGeometry->vertexDataAsPoint2D()[1].set(axisEnd.x(), axisEnd.y());
     createNode(axisGeometry, qRgb(200, 64, 0), node);
 }
 

@@ -38,6 +38,8 @@ Rectangle {
 
             fixtures: Circle {
                 radius: ball.width / 2
+                x: radius
+                y: radius
                 density: 0.5
             }
 

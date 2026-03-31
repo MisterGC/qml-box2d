@@ -18,6 +18,8 @@ Item {
 			fixtures: Circle {
                 id: circle
                 radius: 40
+                x: radius
+                y: radius
                 density: 5
                 friction: 0.3
                 restitution: 0.2
@@ -41,6 +43,8 @@ Item {
             fixtures: Circle {
                 id: circle
                 radius: 40
+                x: radius
+                y: radius
                 density: 2
                 friction: 0.3
                 restitution: 0.2

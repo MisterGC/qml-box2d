@@ -18,6 +18,8 @@ Rectangle {
             fixtures: Circle {
                 property bool isBall: true
                 radius: 10
+                x: radius
+                y: radius
                 density: 0.5
                 friction: 1
                 restitution: 0.2

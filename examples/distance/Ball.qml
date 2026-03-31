@@ -22,6 +22,8 @@ Rectangle {
 
         Circle {
             radius: width / 2
+            x: radius
+            y: radius
             density: 1
             friction: 1
             restitution: 0.3

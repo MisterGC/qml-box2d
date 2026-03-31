@@ -113,7 +113,7 @@ Item {
         x: 400
         y: 300
 
-        fixtures: Circle { radius: itemShape.radius }
+        fixtures: Circle { radius: itemShape.radius; x: radius; y: radius }
 
         Rectangle {
             id: itemShape

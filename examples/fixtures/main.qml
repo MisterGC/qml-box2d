@@ -183,8 +183,6 @@ Rectangle {
             Circle {
                 id: circleShape
                 radius: 50
-                x: -circleShape.radius
-                y: -circleShape.radius
                 density: 0.9
                 friction: 0.3
                 restitution: 0.8

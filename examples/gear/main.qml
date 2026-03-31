@@ -23,6 +23,8 @@ Rectangle {
             bodyType: Body.Dynamic
             fixtures: Circle {
                 radius: box.width / 2
+                x: radius
+                y: radius
                 density: 0.1
                 friction: 10
                 restitution: 0.5

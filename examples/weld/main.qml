@@ -27,6 +27,8 @@ Rectangle {
 
             fixtures: Circle {
                 radius: box.width / 2
+                x: radius
+                y: radius
                 density: 0.1
                 friction: 0.3
                 restitution: 0.5

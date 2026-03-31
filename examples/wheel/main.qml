@@ -25,6 +25,8 @@ Rectangle {
             fixtures: Circle {
                 id: fx
                 radius: ball.width / 2
+                x: radius
+                y: radius
                 density: 0.1
                 friction: 1
                 restitution: 0.5
@@ -168,6 +170,8 @@ Rectangle {
         bodyType: Body.Dynamic
         fixtures: Circle {
             radius: wheelA.width / 2
+            x: radius
+            y: radius
             density: 0.8
             friction: 10
             restitution: 0.8
@@ -187,6 +191,8 @@ Rectangle {
         bodyType: Body.Dynamic
         fixtures: Circle {
             radius: wheelB.width / 2
+            x: radius
+            y: radius
             density: 0.8
             friction: 10
             restitution: 0.8

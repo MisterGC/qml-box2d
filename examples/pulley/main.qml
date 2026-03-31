@@ -21,6 +21,8 @@ Rectangle {
             bodyType: Body.Dynamic
             fixtures: Circle {
                 radius: box.width / 2
+                x: radius
+                y: radius
                 density: 10
                 friction: 0.3
                 restitution: 0.5
@@ -112,7 +114,7 @@ Rectangle {
         y: 85
         width:30
         height: 30
-        fixtures: Circle { radius: 15 }
+        fixtures: Circle { radius: 15; x: radius; y: radius }
         Rectangle {
             anchors.fill: parent
             radius: 15
@@ -126,7 +128,7 @@ Rectangle {
         y: 85
         width: 30
         height: 30
-        fixtures: Circle { radius: 15 }
+        fixtures: Circle { radius: 15; x: radius; y: radius }
         Rectangle {
             anchors.fill: parent
             radius: 15
@@ -354,6 +356,8 @@ Rectangle {
         bodyType: Body.Dynamic
         fixtures: Circle {
             radius: 30
+            x: radius
+            y: radius
             density: 20
             friction: 0.9
         }

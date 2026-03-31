@@ -280,7 +280,7 @@ b2Shape *Box2DCircle::createShape()
     b2CircleShape *shape = new b2CircleShape;
 
     shape->m_radius = mBody->world()->toMeters(radius());
-    shape->m_p = mBody->world()->toMeters(position() + QPointF(radius(), radius()));
+    shape->m_p = mBody->world()->toMeters(position());
 
     return shape;
 }

@@ -130,6 +130,8 @@ Rectangle {
             bodyType: Body.Dynamic
             fixtures: Circle {
                 radius: 24
+                x: radius
+                y: radius
                 density: 0.5
             }
             Image {
@@ -146,6 +148,8 @@ Rectangle {
             bodyType: Body.Dynamic
             fixtures: Circle {
                 radius: 24
+                x: radius
+                y: radius
                 density: 0.5
             }
             Image {
