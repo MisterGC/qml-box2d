@@ -53,7 +53,7 @@ void StepDriver::updateCurrentTime(int)
     static auto start = system_clock::now();
     auto deltaMs = duration_cast<milliseconds>(system_clock::now() - start);
     start = system_clock::now();
-    mWorld->setTimeStep(deltaMs.count()/1000.0f);
+    mWorld->setTimeStep(deltaMs.count()/1000.0f * mWorld->timeScale());
     mWorld->step();
 }
 
@@ -134,6 +134,7 @@ Box2DWorld::Box2DWorld(QObject *parent) :
     mWorld(b2Vec2(0.0f, -10.0f)),
     mContactListener(0),
     mTimeStep(1.0f / 60.0f),
+    mTimeScale(1.0f),
     mVelocityIterations(8),
     mPositionIterations(3),
     mComponentComplete(false),
@@ -169,6 +170,14 @@ void Box2DWorld::setTimeStep(float timeStep)
     if (mTimeStep != timeStep) {
         mTimeStep = timeStep;
         emit timeStepChanged();
+    }
+}
+
+void Box2DWorld::setTimeScale(float timeScale)
+{
+    if (mTimeScale != timeScale) {
+        mTimeScale = timeScale;
+        emit timeScaleChanged();
     }
 }
 

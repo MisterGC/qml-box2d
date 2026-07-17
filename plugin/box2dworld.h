@@ -118,6 +118,7 @@ class Box2DWorld : public QObject, public QQmlParserStatus, b2DestructionListene
 
     Q_PROPERTY(bool running READ isRunning WRITE setRunning NOTIFY runningChanged)
     Q_PROPERTY(float timeStep READ timeStep WRITE setTimeStep NOTIFY timeStepChanged)
+    Q_PROPERTY(float timeScale READ timeScale WRITE setTimeScale NOTIFY timeScaleChanged)
     Q_PROPERTY(int velocityIterations READ velocityIterations WRITE setVelocityIterations NOTIFY velocityIterationsChanged)
     Q_PROPERTY(int positionIterations READ positionIterations WRITE setPositionIterations NOTIFY positionIterationsChanged)
     Q_PROPERTY(QPointF gravity READ gravity WRITE setGravity NOTIFY gravityChanged)
@@ -134,6 +135,9 @@ public:
 
     float timeStep() const;
     void setTimeStep(float timeStep);
+
+    float timeScale() const;
+    void setTimeScale(float timeScale);
 
     bool isRunning() const;
     void setRunning(bool running);
@@ -191,6 +195,7 @@ signals:
     void postSolve(Box2DContact * contact);
 
     void timeStepChanged();
+    void timeScaleChanged();
     void velocityIterationsChanged();
     void positionIterationsChanged();
     void gravityChanged();
@@ -207,6 +212,7 @@ private:
     b2World mWorld;
     ContactListener *mContactListener;
     float mTimeStep;
+    float mTimeScale;
     int mVelocityIterations;
     int mPositionIterations;
     bool mComponentComplete;
@@ -277,6 +283,16 @@ inline float Box2DProfile::emitSignals() const
 inline float Box2DWorld::timeStep() const
 {
     return mTimeStep;
+}
+
+/**
+ * Scales the simulated time per frame (1.0 = real time). The step driver
+ * multiplies the frame delta with this factor, enabling slow motion or
+ * fast forward without touching the frame-derived timeStep.
+ */
+inline float Box2DWorld::timeScale() const
+{
+    return mTimeScale;
 }
 
 inline bool Box2DWorld::isRunning() const
