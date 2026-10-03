@@ -389,6 +389,10 @@ void Box2DBody::updateTransform()
                     mTarget->position() + originOffset());
 
     mBody->SetTransform(mBodyDef.position, mBodyDef.angle);
+    // SetTransform wakes nothing, and a contact between two sleeping bodies
+    // is never updated: a body moved only by its position would never begin
+    // a contact with a sleeping sensor.
+    mBody->SetAwake(true);
     mTransformDirty = false;
 }
 
