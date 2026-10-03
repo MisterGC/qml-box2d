@@ -33,11 +33,10 @@
 #include "box2djoint.h"
 #include "box2draycast.h"
 
-#include <chrono>
-
 StepDriver::StepDriver(Box2DWorld *world)
     : QAbstractAnimation(world)
     , mWorld(world)
+    , mLastNs(0)
 {
     setLoopCount(-1); // loop forever
 }
@@ -49,12 +48,26 @@ int StepDriver::duration() const
 
 void StepDriver::updateCurrentTime(int)
 {
-    using namespace std::chrono;
-    static auto start = system_clock::now();
-    auto deltaMs = duration_cast<milliseconds>(system_clock::now() - start);
-    start = system_clock::now();
-    mWorld->setTimeStep(deltaMs.count()/1000.0f * mWorld->timeScale());
+    // The first update after (re)starting only starts the clock: the time
+    // the world stood still is not simulated, the next frame steps by its
+    // own delta.
+    if (!mClock.isValid()) {
+        mClock.start();
+        mLastNs = 0;
+        return;
+    }
+    const qint64 nowNs = mClock.nsecsElapsed();
+    const qint64 deltaNs = nowNs - mLastNs;
+    mLastNs = nowNs;
+    mWorld->setTimeStep(deltaNs / 1e9f * mWorld->timeScale());
     mWorld->step();
+}
+
+void StepDriver::updateState(State newState, State oldState)
+{
+    Q_UNUSED(oldState)
+    if (newState == Running)
+        mClock.invalidate();
 }
 
 

@@ -29,6 +29,7 @@
 #define BOX2DWORLD_H
 
 #include <QAbstractAnimation>
+#include <QElapsedTimer>
 #include <QQuickItem>
 #include <QQuickItem>
 
@@ -56,9 +57,14 @@ public:
 
 protected:
     void updateCurrentTime(int);
+    void updateState(State newState, State oldState);
 
 private:
     Box2DWorld *mWorld;
+    // One clock per world, restarted whenever the world starts running, so
+    // a pause is never measured as one step.
+    QElapsedTimer mClock;
+    qint64 mLastNs;
 };
 
 
